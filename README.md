@@ -5,10 +5,25 @@ Although it is called pydf.py but it is called pysidedf.
 
 This program requires:
 1. PySide6
-2. PyQt6-Charts-Qt6
+2. qt6-charts
 3. psutil
+----------------------
+UI - Contains
+## Boxes
+1. Filesystem for device nodes
+2. Total
+3. Used
+4. Free
+5. Used %
+6. FS-Type
+7. Mounted On
 
-
+## Other parts
+1. Combo box for selecting block size - this will refresh the disk list
+2. Combo box for selecting mount dir - to use with show chart button.
+3. Show chart button - shows a dialog with a pie chart for a selected mount point.
+4. About button - About dialog
+5. Quit button - exits
 ----------------------------------------------------
 test_df.py - pydf.py unit tester
 
