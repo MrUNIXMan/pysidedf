@@ -58,20 +58,19 @@ Copyright (C) 2026 Vince
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
+the Free Software Foundation, either version 2 of the License, or
 (at your option) any later version.
 """
 #---------------------------------------------------------------------------------
 """
- Default Disk UNIT Values
+ Default Disk UNIT index that can be used with DISK_UNIT =
 
-  b = Bytes
-  5 = 512 Blocks    (POSIX Standard)
-  k = 1024 Blocks
-  m = Megabytes
-  g = Gigabytes
-  h = Human Readable
-
+  0 = Onek (1024 blocks)
+  1 = Megabytes
+  2 = Gigabytes
+  3 = Human Readable
+  4 = Bytes
+  5 = Posix Standard Blocksize (512 blocks) 
 
  These are required for blocksize calculations
 """
@@ -79,10 +78,6 @@ the Free Software Foundation, either version 3 of the License, or
 # Global Params goes here
 
 DISK_UNIT = 0
-
-# Index        0    1    2    3    4   5
-DISK_UNITS = ["k", "m", "g", "h", "b", 5]
-
 
 class DlgCopyRight(QDialog):
     """ Copyright  Dialog"""
@@ -189,16 +184,14 @@ class Window(QMainWindow):
         self.spaces_dict = None
         self.usage = None
 
-
         self.gui_components()
 
         # Method to set up the GUI
 
     def gui_components(self):
-        """ Method one for Gui components """
+        """ Method for Gui components """
 
         #Labels
-
 
         self.qlabels = {
             'lbl_dev': QLabel(self),        # Device
@@ -308,13 +301,9 @@ class Window(QMainWindow):
             ]
         )
 
-
-
         # Connections
 
         self.combo['combo_blk_sizes'].currentIndexChanged.connect(self.combo_blk_sizes_changed)
-
-
         self.buttons['btn_show_chart'].clicked.connect(self.show_chart)
         self.buttons['btn_quit'].clicked.connect(self.quit)
         self.buttons['btn_about'].clicked.connect(self.about)
@@ -325,7 +314,6 @@ class Window(QMainWindow):
     # Combos
     def combo_blk_sizes_changed(self, index):
         """Combo blk sizes changed"""
-        print(index)
         self.get_disk_usage(index)
 
 
@@ -353,7 +341,7 @@ class Window(QMainWindow):
 #-------------------------------------------------------------------------------
 #Disk usage functions
 
-    def onek(self,usage):
+    def display_onek_format(self,usage):
         """ 1024 blocksize function"""
         self.usage = usage
         self.spaces_dict['total'] = usage.total / 1024
@@ -368,7 +356,7 @@ class Window(QMainWindow):
         # Final Label
         self.qlabels['lbl_info'].setText("Displaying in 1k blocksize")
 
-    def megabytes(self,usage):
+    def display_megabytes_format(self,usage):
         """ Megabytes function"""
         self.usage = usage
         self.spaces_dict['total'] = usage.total / 1024 / 1024
@@ -383,7 +371,7 @@ class Window(QMainWindow):
         # Final Label
         self.qlabels['lbl_info'].setText("Displaying in Megabytes")
 
-    def gigabytes(self,usage):
+    def display_gigabytes_format(self,usage):
         """ Gigabytes function"""
         self.usage = usage
 
@@ -399,7 +387,27 @@ class Window(QMainWindow):
         # Final Label
         self.qlabels['lbl_info'].setText("Displaying in gigabytes")
 
-    def posix(self,usage):
+
+    def display_human_format(self,usage):
+        """ Display human"""
+        self.usage = usage
+        self.widgets['total_box'].append(bytes2human(usage.total))
+        self.widgets['used_box'].append(bytes2human(usage.used))
+        self.widgets['free_box'].append(bytes2human(usage.free))
+        self.qlabels['lbl_info'].setText("Displaying in Human readable format")
+
+
+    def display_bytes_format(self,usage):
+        """ Display bytes format"""
+        self.usage = usage
+
+        self.widgets['total_box'].append(f"{usage.total:,}")
+        self.widgets['used_box'].append(f"{usage.used:,}")
+        self.widgets['free_box'].append(f"{usage.free:,}")
+        # Final Label
+        self.qlabels['lbl_info'].setText("Displaying in bytes")
+
+    def display_posix_format(self,usage):
         """ 512 blocksize function"""
         self.usage = usage
 
@@ -463,27 +471,22 @@ class Window(QMainWindow):
 
             match index:
                 case 0:
-                    self.onek(usage)
+                    #1024 Block Size
+                    self.display_onek_format(usage)
                 case 1:
-                    self.megabytes(usage)
+                    self.display_megabytes_format(usage)
                 case 2:
-                    self.gigabytes(usage)
+                    self.display_gigabytes_format(usage)
                 case 3:
-                    self.widgets['total_box'].append(bytes2human(usage.total))
-                    self.widgets['used_box'].append(bytes2human(usage.used))
-                    self.widgets['free_box'].append(bytes2human(usage.free))
-                    self.qlabels['lbl_info'].setText("Displaying in Human readable format")
+                    self.display_human_format(usage)
                 case 4:
-                    self.widgets['total_box'].append(f"{usage.total:,}")
-                    self.widgets['used_box'].append(f"{usage.used:,}")
-                    self.widgets['free_box'].append(f"{usage.free:,}")
-                    # Final Label
-                    self.qlabels['lbl_info'].setText("Displaying in bytes")
+                    self.display_bytes_format(usage)
                 case 5:
-                    self.posix(usage)
+                    #512 Blocksize (UNIX standard)
+                    self.display_posix_format(usage)
     #------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------------
+
 # Run the application but
 # to make sure it is a UNIX system.
 
