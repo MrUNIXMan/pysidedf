@@ -1,4 +1,4 @@
-# pydf.py
+# pysidedfv6.py
 Little df like program in a window showing a formatted output allowing changing of block sizes and showing a pie chart of a mount dir.
 Although it is called pydf.py but it is called pysidedf.
 
@@ -25,7 +25,7 @@ UI - Contains
 4. About button - About dialog
 5. Quit button - exits
 ----------------------------------------------------
-test_df.py - pydf.py unit tester
+# test_pysidedfv6.py - pysidedfv6.py unit tester
 
 This program requires:
 1. pytest-qt
